@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AARAMBH CLASS 9 Player - Watch Live & Recorded Lectures</title>
+    <!-- AOS Animation -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <!-- Remix Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- HLS.js -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --glass: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460, #533483);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Header Styles */
+        header {
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #f72585, #4361ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+        
+        /* Input Section */
+        .input-section {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+        }
+        
+        .url-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .url-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(247, 37, 133, 0.3);
+        }
+        
+        .url-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--accent), var(--primary));
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            margin-left: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Player Section */
+        .player-container {
+            max-width: 1000px;
+            margin: 0 auto 50px;
+            padding: 0 20px;
+            display: none;
+        }
+        
+        #video-player {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: #000;
+        }
+        
+        .player-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .control-btn i {
+            font-size: 1.2rem;
+        }
+        
+        /* Chat Section (UI Only) */
+        .chat-section {
+            max-width: 1000px;
+            margin: 0 auto 50px;
+            padding: 0 20px;
+            display: none;
+        }
+        
+        .chat-container {
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+        }
+        
+        /* Features Section */
+        .features {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2rem;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, var(--accent), var(--primary));
+            border-radius: 3px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .feature-card {
+            padding: 30px;
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .feature-desc {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+        
+        /* Telegram Section */
+        .telegram-section {
+            max-width: 800px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+            text-align: center;
+        }
+        
+        .telegram-btn {
+            margin-top: 20px;
+            padding: 15px 30px;
+            background: linear-gradient(to right, #0088cc, #00a8ff);
+        }
+        
+        .telegram-btn:hover {
+            box-shadow: 0 5px 20px rgba(0, 168, 255, 0.4);
+        }
+        
+        /* Social Icons */
+        .social-icons {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+        }
+        
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .social-icon:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .whatsapp {
+            background: linear-gradient(to right, #25D366, #128C7E);
+        }
+        
+        .telegram {
+            background: linear-gradient(to right, #0088cc, #00a8ff);
+        }
+        
+        .instagram {
+            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+        }
+        
+        /* Share Modal */
+        .share-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .share-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .share-content {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .share-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .share-input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .social-share {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .social-share-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .social-share-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .close-share {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .close-share:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(247, 37, 133, 0.4);
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            margin-top: 60px;
+        }
+        
+        .footer-text {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .footer-text::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+        
+        .footer-text:hover::after {
+            width: 100%;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .tagline {
+                font-size: 1rem;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .btn-secondary {
+                margin-left: 0;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .social-icons {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .social-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header data-aos="fade-down">
+        <img src="https://i.supaimg.com/8698d8ee-5f85-473a-8112-01613f347cfc.jpg" alt="AARAMBH CLASS 9 Logo" class="logo" onclick="window.location.href='#'">
+        <h1>AARAMBH CLASS 9 <span style="color: gold;">Player</span></h1>
+        <p class="tagline">Watch Live & Recorded Lectures</p>
+    </header>
+    
+    <!-- Input Section -->
+    <section class="input-section" data-aos="fade-up" data-aos-delay="100">
+        <div class="glass-card">
+            <input type="text" id="video-url" class="url-input" placeholder="Enter YouTube Live/Video or M3U8 link...">
+            <div style="display: flex; justify-content: center; flex-wrap: wrap;">
+                <button id="play-btn" class="btn"><i class="ri-play-fill"></i> Play</button>
+                <button id="reset-btn" class="btn btn-secondary"><i class="ri-refresh-line"></i> Reset</button>
+                <button id="chat-toggle" class="btn btn-secondary"><i class="ri-chat-3-line"></i> Chat</button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Player Section -->
+    <section class="player-container" id="player-section" data-aos="zoom-in">
+        <div class="glass-card">
+            <div id="video-player"></div>
+            <div class="player-controls">
+                <button id="share-btn" class="control-btn" title="Share"><i class="ri-share-line"></i></button>
+                <div>
+                    <button id="volume-btn" class="control-btn" title="Volume"><i class="ri-volume-up-line"></i></button>
+                    <button id="fullscreen-btn" class="control-btn" title="Fullscreen"><i class="ri-fullscreen-line"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Chat Section (UI Only) -->
+    <section class="chat-section" id="chat-section">
+        <div class="glass-card">
+            <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                <i class="ri-chat-3-line"></i> Live Chat
+            </h3>
+            <div class="chat-container">
+                <!-- Demo chat messages -->
+                <div style="margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <strong>Teacher:</strong> Welcome to today's lecture!
+                </div>
+                <div style="margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <strong>Student:</strong> Good morning sir!
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" placeholder="Type your message..." style="flex: 1; padding: 10px; border-radius: 8px; border: none; background: rgba(255,255,255,0.1); color: white;">
+                <button class="btn" style="padding: 10px 20px;"><i class="ri-send-plane-line"></i></button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="features">
+        <h2 class="section-title" data-aos="fade-down">Key Features</h2>
+        <div class="features-grid">
+            <div class="glass-card feature-card" data-aos="zoom-in-up" data-aos-delay="100">
+                <div class="feature-icon"><i class="ri-live-line"></i></div>
+                <h3 class="feature-title">YouTube Live Support</h3>
+                <p class="feature-desc">Watch live classes directly in the player without being redirected to YouTube. Perfect for uninterrupted learning sessions.</p>
+            </div>
+            <div class="glass-card feature-card" data-aos="zoom-in-up" data-aos-delay="200">
+                <div class="feature-icon"><i class="ri-server-line"></i></div>
+                <h3 class="feature-title">M3U8 Streaming</h3>
+                <p class="feature-desc">Advanced HLS.js support for smooth playback of lecture streams with adaptive bitrate for all connection speeds.</p>
+            </div>
+            <div class="glass-card feature-card" data-aos="zoom-in-up" data-aos-delay="300">
+                <div class="feature-icon"><i class="ri-smartphone-line"></i></div>
+                <h3 class="feature-title">Mobile Optimized</h3>
+                <p class="feature-desc">Full responsive design with rotation support. Watch lectures on any device with touch-friendly controls.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Telegram Section -->
+    <section class="telegram-section" data-aos="slide-left">
+        <div class="glass-card">
+            <div class="feature-icon"><i class="ri-telegram-line"></i></div>
+            <h2 class="feature-title">Join Class 9 NEEV Batch (Free)</h2>
+            <p class="feature-desc">The NEEV Batch is a completely free course offered by Physics Wallah for Class 9 students. Get access to premium quality education resources at no cost.</p>
+            <a href="https://t.me/neev_2027" target="_blank" class="btn telegram-btn"><i class="ri-telegram-line"></i> Join Telegram Channel</a>
+        </div>
+    </section>
+    
+    <!-- Social Icons -->
+    <div class="social-icons">
+        <div class="social-icon whatsapp" data-aos="fade-left" data-aos-delay="100" title="WhatsApp" onclick="window.open('https://wa.me/')">
+            <i class="ri-whatsapp-line"></i>
+        </div>
+        <div class="social-icon telegram" data-aos="fade-left" data-aos-delay="200" title="Telegram" onclick="window.open('https://t.me/')">
+            <i class="ri-telegram-line"></i>
+        </div>
+        <div class="social-icon instagram" data-aos="fade-left" data-aos-delay="300" title="Instagram" onclick="window.open('https://instagram.com/')">
+            <i class="ri-instagram-line"></i>
+        </div>
+    </div>
+    
+    <!-- Share Modal -->
+    <div class="share-modal" id="share-modal">
+        <div class="share-content glass-card" data-aos="zoom-in">
+            <h3 class="share-title">Share This Video</h3>
+            <input type="text" id="share-link" class="share-input" readonly>
+            <div class="social-share">
+                <div class="social-share-btn whatsapp" onclick="shareOnWhatsApp()">
+                    <i class="ri-whatsapp-line"></i>
+                </div>
+                <div class="social-share-btn telegram" onclick="shareOnTelegram()">
+                    <i class="ri-telegram-line"></i>
+                </div>
+                <div class="social-share-btn instagram" onclick="shareOnInstagram()">
+                    <i class="ri-instagram-line"></i>
+                </div>
+                <div class="social-share-btn" style="background: #7289da;" onclick="copyShareLink()">
+                    <i class="ri-links-line"></i>
+                </div>
+            </div>
+            <button class="close-share" onclick="closeShareModal()">Close</button>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer data-aos="fade-up">
+        <p class="footer-text">Web developed by Murli Kumar © 2025</p>
+    </footer>
+    
+    <!-- AOS Animation -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        // Initialize AOS animation
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: false
+        });
+        
+        // DOM Elements
+        const videoUrlInput = document.getElementById('video-url');
+        const playBtn = document.getElementById('play-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const chatToggle = document.getElementById('chat-toggle');
+        const playerSection = document.getElementById('player-section');
+        const chatSection = document.getElementById('chat-section');
+        const videoPlayer = document.getElementById('video-player');
+        const shareBtn = document.getElementById('share-btn');
+        const volumeBtn = document.getElementById('volume-btn');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const shareModal = document.getElementById('share-modal');
+        const shareLinkInput = document.getElementById('share-link');
+        
+        // Variables
+        let currentVideoUrl = '';
+        let isMuted = false;
+        let isChatVisible = false;
+        let hls = null;
+        
+        // Event Listeners
+        playBtn.addEventListener('click', playVideo);
+        resetBtn.addEventListener('click', resetPlayer);
+        chatToggle.addEventListener('click', toggleChat);
+        shareBtn.addEventListener('click', showShareModal);
+        volumeBtn.addEventListener('click', toggleVolume);
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+        
+        // Play Video Function
+        function playVideo() {
+            const url = videoUrlInput.value.trim();
+            
+            if (!url) {
+                alert('Please enter a valid YouTube or M3U8 URL');
+                return;
+            }
+            
+            currentVideoUrl = url;
+            playerSection.style.display = 'block';
+            
+            // Scroll to player
+            playerSection.scrollIntoView({ behavior: 'smooth' });
+            
+            // Check if YouTube URL
+            if (isYouTubeUrl(url)) {
+                loadYouTubeVideo(url);
+            } 
+            // Check if M3U8 URL
+            else if (isM3U8Url(url)) {
+                loadM3U8Video(url);
+            } 
+            else {
+                alert('Invalid URL. Please enter a valid YouTube or M3U8 URL');
+                playerSection.style.display = 'none';
+            }
+            
+            // Update URL for sharing
+            updateShareUrl();
+        }
+        
+        // Reset Player Function
+        function resetPlayer() {
+            videoUrlInput.value = '';
+            videoPlayer.innerHTML = '';
+            playerSection.style.display = 'none';
+            chatSection.style.display = 'none';
+            currentVideoUrl = '';
+            isChatVisible = false;
+            
+            // Destroy HLS instance if exists
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
+            
+            // Reset URL
+            const baseUrl = window.location.href.split('?')[0];
+            window.history.pushState({}, document.title, baseUrl);
+        }
+        
+        // Toggle Chat Function
+        function toggleChat() {
+            isChatVisible = !isChatVisible;
+            chatSection.style.display = isChatVisible ? 'block' : 'none';
+            
+            if (isChatVisible) {
+                chatSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        // Show Share Modal
+        function showShareModal() {
+            if (!currentVideoUrl) return;
+            
+            shareLinkInput.value = window.location.href;
+            shareModal.classList.add('active');
+        }
+        
+        // Close Share Modal
+        function closeShareModal() {
+            shareModal.classList.remove('active');
+        }
+        
+        // Share on WhatsApp
+        function shareOnWhatsApp() {
+            const shareUrl = `https://wa.me/?text=${encodeURIComponent('Check out this video: ' + window.location.href)}`;
+            window.open(shareUrl, '_blank');
+        }
+        
+        // Share on Telegram
+        function shareOnTelegram() {
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent('Check out this video')}`;
+            window.open(shareUrl, '_blank');
+        }
+        
+        // Share on Instagram
+        function shareOnInstagram() {
+            alert('Please copy the link and share it on Instagram');
+        }
+        
+        // Copy Share Link
+        function copyShareLink() {
+            shareLinkInput.select();
+            document.execCommand('copy');
+            alert('Link copied to clipboard!');
+        }
+        
+        // Toggle Volume Function
+        function toggleVolume() {
+            isMuted = !isMuted;
+            
+            const videoElement = videoPlayer.querySelector('video');
+            const iframeElement = videoPlayer.querySelector('iframe');
+            
+            if (videoElement) {
+                videoElement.muted = isMuted;
+                volumeBtn.innerHTML = isMuted ? '<i class="ri-volume-mute-line"></i>' : '<i class="ri-volume-up-line"></i>';
+            }
+            
+            if (iframeElement) {
+                // For YouTube iframe, we can't control volume directly
+                volumeBtn.innerHTML = isMuted ? '<i class="ri-volume-mute-line"></i>' : '<i class="ri-volume-up-line"></i>';
+            }
+        }
+        
+        // Toggle Fullscreen Function
+        function toggleFullscreen() {
+            const playerContainer = videoPlayer.parentElement;
+            
+            if (!document.fullscreenElement) {
+                if (playerContainer.requestFullscreen) {
+                    playerContainer.requestFullscreen();
+                } else if (playerContainer.webkitRequestFullscreen) {
+                    playerContainer.webkitRequestFullscreen();
+                } else if (playerContainer.msRequestFullscreen) {
+                    playerContainer.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+        
+        // Load YouTube Video Function (with Live support)
+        function loadYouTubeVideo(url) {
+            const videoId = extractYouTubeId(url);
+            
+            if (!videoId) {
+                alert('Invalid YouTube URL');
+                return;
+            }
+            
+            // For live videos, use different embed parameters
+            const isLive = url.includes('youtube.com/live');
+            const embedParams = isLive ? 
+                `autoplay=1&rel=0&modestbranding=1&controls=1` : 
+                `autoplay=1&rel=0&modestbranding=1`;
+            
+            const embedUrl = `https://www.youtube.com/embed/${videoId}?${embedParams}`;
+            
+            videoPlayer.innerHTML = `
+                <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src="${embedUrl}" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen
+                ></iframe>
+            `;
+        }
+        
+        // Load M3U8 Video Function (Fixed)
+        function loadM3U8Video(url) {
+            // Clear previous content
+            videoPlayer.innerHTML = '';
+            
+            // Create video element
+            const videoElement = document.createElement('video');
+            videoElement.controls = true;
+            videoElement.autoplay = true;
+            videoElement.style.width = '100%';
+            videoElement.style.height = '100%';
+            
+            // Append to player
+            videoPlayer.appendChild(videoElement);
+            
+            if (Hls.isSupported()) {
+                // Destroy previous HLS instance if exists
+                if (hls) {
+                    hls.destroy();
+                }
+                
+                // Create new HLS instance
+                hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(videoElement);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    videoElement.play();
+                });
+                
+                hls.on(Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        switch(data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                alert('Network error occurred while loading the video');
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                alert('Media error occurred - trying to recover');
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                alert('Error loading video');
+                                resetPlayer();
+                                break;
+                        }
+                    }
+                });
+            } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+                // For Safari
+                videoElement.src = url;
+                videoElement.addEventListener('loadedmetadata', function() {
+                    videoElement.play();
+                });
+            } else {
+                alert('HLS playback is not supported on your browser');
+            }
+        }
+        
+        // Helper Functions
+        function isYouTubeUrl(url) {
+            return url.includes('youtube.com') || url.includes('youtu.be');
+        }
+        
+        function isM3U8Url(url) {
+            return url.includes('.m3u8') || url.includes('.m3u');
+        }
+        
+        function extractYouTubeId(url) {
+            // Handle standard YouTube URLs
+            const regExpStandard = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const matchStandard = url.match(regExpStandard);
+            
+            // Handle YouTube Live URLs (youtube.com/live/VIDEO_ID)
+            const regExpLive = /youtube.com\/live\/([^#&?]*)/;
+            const matchLive = url.match(regExpLive);
+            
+            if (matchLive && matchLive[1]) {
+                return matchLive[1];
+            }
+            
+            return (matchStandard && matchStandard[2].length === 11) ? matchStandard[2] : null;
+        }
+        
+        function updateShareUrl() {
+            const baseUrl = window.location.href.split('?')[0];
+            const shareUrl = `${baseUrl}?url=${encodeURIComponent(currentVideoUrl)}`;
+            window.history.pushState({}, document.title, shareUrl);
+        }
+        
+        // Check for URL parameter on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlParam = urlParams.get('url');
+            
+            if (urlParam) {
+                videoUrlInput.value = decodeURIComponent(urlParam);
+                playVideo();
+            }
+        });
+        
+        // Allow pressing Enter key to play video
+        videoUrlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                playVideo();
+            }
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === shareModal) {
+                closeShareModal();
+            }
+        });
+    </script>
+</body>
+</html>
